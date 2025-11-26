@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from langbot_plugin.api.definition.plugin import BasePlugin
 import requests, random
+from thefuzz import process
 
 class PigHubBot(BasePlugin):
 
@@ -17,7 +18,6 @@ class PigHubBot(BasePlugin):
             "Content-Type": "application/json;charset=utf-8",
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
         }
-        self.images = await self.all_images()
     
     async def all_images(self):
         api = "/api/all-images"
@@ -33,7 +33,7 @@ class PigHubBot(BasePlugin):
             return None
         
     async def random_image(self):
-        body = self.images
+        body = await self.all_images()
         if body:
             list = body["images"]
             data = random.choice(list)
@@ -43,16 +43,13 @@ class PigHubBot(BasePlugin):
             return None
         
     async def random_filtered_image(self, keyword):
-        body = self.images
+        body = await self.all_images()
         if body:
             image_list = body["images"]
-            filtered_list = list(filter(lambda x: 
-                                        keyword.lower() in x["title"].lower() or
-                                        keyword.lower() in x["filename"].lower() or
-                                        keyword.lower() in x["duration"].lower(), image_list))
-            if filtered_list:
-                data = random.choice(filtered_list)
-                filename = data["filename"]
+            best_match = process.extractOne(keyword, image_list)
+            image, _ = best_match
+            if image:
+                filename = image["filename"]
                 return self.pighub_url + "/data/" + filename
             else:
                 return None
