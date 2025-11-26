@@ -38,6 +38,8 @@ class PigHubBot(BasePlugin):
             data = random.choice(list)
             filename = data["filename"]
             return self.pighub_url + "/data/" + filename
+        else:
+            return None
         
     async def random_filtered_image(self, keyword):
         body = await self.all_images()
@@ -47,6 +49,11 @@ class PigHubBot(BasePlugin):
                                         keyword.lower() in x["title"].lower() or
                                         keyword.lower() in x["filename"].lower() or
                                         keyword.lower() in x["duration"].lower(), image_list))
-            data = random.choice(filtered_list)
-            filename = data["filename"]
-            return self.pighub_url + "/data/" + filename
+            if filtered_list:
+                data = random.choice(filtered_list)
+                filename = data["filename"]
+                return self.pighub_url + "/data/" + filename
+            else:
+                return None
+        else:
+            return None

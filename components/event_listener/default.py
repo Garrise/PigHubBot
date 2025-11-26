@@ -18,12 +18,14 @@ class DefaultEventListener(EventListener):
             msg = str(ctx.event.message_chain).strip()
             if msg == "/pighub" or msg == "/猪":
                 image_url = await self.plugin.random_image()
-                await ctx.reply(MessageChain([
-                    Image(url=image_url)
-                ]))
             if re.match(r"^/pighub\s+(.*)$", msg) or re.match(r"^/猪\s+(.*)$", msg):
                 keyword = str(msg.split()[-1])
                 image_url = await self.plugin.random_filtered_image(keyword)
+            if image_url:
                 await ctx.reply(MessageChain([
                     Image(url=image_url)
+                ]))
+            else:
+                await ctx.reply(MessageChain([
+                    Plain(text="无法获取猪猪图！")
                 ]))
