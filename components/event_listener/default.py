@@ -16,16 +16,30 @@ class DefaultEventListener(EventListener):
         @self.handler(events.GroupMessageReceived)
         async def handler(ctx: context.EventContext):
             msg = str(ctx.event.message_chain).strip()
+            image_url = None
             if msg == "/pighub" or msg == "/猪":
                 image_url = await self.plugin.random_image()
+                if image_url:
+                    await ctx.reply(MessageChain([
+                        Image(url=image_url)
+                    ]))
+                else:
+                    await ctx.reply(MessageChain([
+                        Plain(text="无法获取猪猪图！")
+                    ]))
             if re.match(r"^/pighub\s+(.*)$", msg) or re.match(r"^/猪\s+(.*)$", msg):
                 keyword = str(msg.split()[-1])
                 image_url = await self.plugin.random_filtered_image(keyword)
-            if image_url:
+                if image_url:
+                    await ctx.reply(MessageChain([
+                        Image(url=image_url)
+                    ]))
+                else:
+                    await ctx.reply(MessageChain([
+                        Plain(text="无法获取猪猪图！")
+                    ]))
+            if msg == "/pigrefresh" or msg == "/刷新猪":
+                self.plugin.images = self.plugin.all_images()
                 await ctx.reply(MessageChain([
-                    Image(url=image_url)
-                ]))
-            else:
-                await ctx.reply(MessageChain([
-                    Plain(text="无法获取猪猪图！")
+                    Plain(text="猪猪图列表刷新完毕！")
                 ]))

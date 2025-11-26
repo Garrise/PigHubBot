@@ -17,6 +17,7 @@ class PigHubBot(BasePlugin):
             "Content-Type": "application/json;charset=utf-8",
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
         }
+        self.images = await self.all_images()
     
     async def all_images(self):
         api = "/api/all-images"
@@ -32,7 +33,7 @@ class PigHubBot(BasePlugin):
             return None
         
     async def random_image(self):
-        body = await self.all_images()
+        body = self.images
         if body:
             list = body["images"]
             data = random.choice(list)
@@ -42,7 +43,7 @@ class PigHubBot(BasePlugin):
             return None
         
     async def random_filtered_image(self, keyword):
-        body = await self.all_images()
+        body = self.images
         if body:
             image_list = body["images"]
             filtered_list = list(filter(lambda x: 
