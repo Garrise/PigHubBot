@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from langbot_plugin.api.definition.plugin import BasePlugin
-import requests, random
+import httpx, random, asyncio
 from thefuzz import process
 
 class PigHubBot(BasePlugin):
@@ -22,12 +22,13 @@ class PigHubBot(BasePlugin):
     async def all_images(self):
         api = "/api/all-images"
         try:
-            response = requests.get(self.pighub_url + api, headers=self.headers)
-            if response.ok:
-                return response.json()
-            else:
-                print(response)
-                return None
+            async with httpx.AsyncClient() as client:
+                response = await client.get(self.pighub_url + api, headers=self.headers)
+                if response.status_code == 200:
+                    return response.json()
+                else:
+                    print(response)
+                    return None
         except Exception as e:
             print(e)
             return None
